@@ -1,15 +1,29 @@
 from datetime import datetime
-from SimcraftHelper import update_profile
+from subprocess import Popen, PIPE
+from uploader import upload_result
 
-result_file = 'Maximum_simulated_dps_{}.html'.format(datetime.utcnow().strftime('%Y-%b-%d_%H:%M'))
+result_file = "C:\Simcraft\SimcraftAutoCalc\Results\Maximum_simulated_dps_{}.html"\
+              .format(datetime.utcnow().strftime('%Y-%b-%d_%H-%M'))
 
 REGION = 'EU'
-REALM = '���������'
-RAIDERS = {'�����', '�������', '�����'}
-PROFILES_PATH = 'C:\Simcraft\SimcraftAutoCalc\Profiles'
+REALM = 'Галакронд'
+RAIDERS = {'Джеви', 'Гринндерс', 'Арсти', 'Лапулька', 'Овермун', 'Уитэко', 'Импси', 'Террикс', 'Лич', 'Принсэс',
+           'Нукактотак', 'Виченца', 'Ридион', 'Эмберлиз'}
 
-profiles = set()
+
+all_characters_sim_profile = []
 for name in RAIDERS:
-    profile_name = update_profile(region=REGION, realm=REALM, name=name, profile_folder=PROFILES_PATH)
-    if profile_name is not None:
-        profiles.add(profile_name)
+    all_characters_sim_profile.append('armory={},{},{}'.format(REGION, REALM, name))
+
+command_line = ['simc64']
+[command_line.append(c) for c in all_characters_sim_profile]
+command_line.append('html={}'.format(result_file))
+
+print('Command line: {}'.format(command_line))
+p = Popen(command_line, stderr=PIPE)
+out, err = p.communicate()
+if err:
+    print(err)
+    raise Exception("Simulation failed")
+else:
+    upload_result(result_file)

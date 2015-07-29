@@ -1,9 +1,0 @@
-# Import current DD
-armory=eu,галакронд,Импси
-save=Profiles/Impsi.simc
-
-armory=eu,галакронд,Террикс
-save=Profiles/Terrix.simc
-
-armory=eu,галакронд,Джеви
-save=Profiles/Djevi.simc
