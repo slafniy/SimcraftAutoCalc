@@ -29,7 +29,7 @@ class Character:
         _, err = simc_process.communicate()
         if err:
             self._logger.warning("Error occurred while profile {} importing: {}"
-                            .format(full_name, err))
+                                 .format(full_name, err))
         else:
             self._logger.info("Profile {} has been imported and saved to file {}".format(full_name, tmp_file_name))
 
@@ -52,9 +52,16 @@ class Character:
             spec = 'unknown'
             ilvl = 'unknown'
             for line in lines:
+                if 'role=heal' in line or 'role=tank' in line:
+                    lines = None
+                    self._logger.info("Healer's spec has been skipped")
+                    break
                 if 'spec=' in line:
                     spec = line.split('=')[1]
                 if '# gear_ilvl=' in line:
                     ilvl = line.split('=')[1]
-            lines[0] = lines[0].split('=')[0] + '=' + '"{}"'.format(self.name + '_' + spec + '_item_level_' + ilvl)
+            if lines is None:
+                self.simulation_profile = None
+                return
+            lines[0] = lines[0].split('=')[0] + '=' + '"{}"'.format(self.name + '_' + spec + '_' + ilvl)
             self.simulation_profile = '\n'.join(lines)
