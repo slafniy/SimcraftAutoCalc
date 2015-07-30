@@ -15,15 +15,16 @@ class Character:
         self.realm = realm
         self.is_offspec = is_offspec
         self.simulation_profile = None
-        self.offspec_simulation_profile = None
-        self._get_simulation_profiles()
+        self._get_simulation_profile()
     
-    def _get_simulation_profiles(self) -> None:
+    def _get_simulation_profile(self) -> None:
         full_name = '{} {}-{}'.format(self.name, self.region, self.realm)
         tmp_file_name = '.tmp_imported_file_for_simcraft.simc'
         self._logger.info('Importing {}...'.format(full_name))
-        cmd_command = ['simc64', 'armory={},{},{}'.format(self.region, self.realm, self.name),
-                       'save={}'.format(tmp_file_name)]
+        cmd_command = ['simc64', 'armory={},{},{}'.format(self.region, self.realm, self.name)]
+        if self.is_offspec:
+            cmd_command[-1] += ',spec=inactive'
+        cmd_command.append('save={}'.format(tmp_file_name))
         simc_process = Popen(cmd_command, stderr=PIPE)
         _, err = simc_process.communicate()
         if err:
@@ -36,11 +37,13 @@ class Character:
         try:
             with open(tmp_file_name, mode='tr', encoding='UTF-8') as f:
                 simulation_data = f.read()
+                self._logger.info("Data saved from file {}".format(tmp_file_name))
         except FileNotFoundError as err:
             self._logger.error("Cannot open temporary file: {}".format(err))
 
         try:
             os.remove(tmp_file_name)
+            self._logger.info('Temp file {} removed.'.format(tmp_file_name))
         except Exception as err:
             self._logger.warning('Cannot remove temp file: {}'.format(err))
 
@@ -55,7 +58,3 @@ class Character:
                     ilvl = line.split('=')[1]
             lines[0] = lines[0].split('=')[0] + '=' + '"{}"'.format(self.name + '_' + spec + '_item_level_' + ilvl)
             self.simulation_profile = '\n'.join(lines)
-            print(self.simulation_profile)
-
-
-instance = Character('Импси')
