@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 result_file = "C:/Simcraft/SimcraftAutoCalc/Results/Maximum_simulated_dps_{}.html"\
-              .format(datetime.utcnow().strftime('%Y-%b-%d_%H-%M'))
+              .format(datetime.utcnow().strftime('%Y-%m-%d_%H-%M'))
 tmp_file_name = 'C:/Simcraft/SimcraftAutoCalc/Results/tmp.simc'
 
 REGION = 'EU'
