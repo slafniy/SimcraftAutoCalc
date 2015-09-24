@@ -1,6 +1,7 @@
 import os
 from subprocess import Popen, PIPE
 import logging
+from SimcraftHelper import simc_path
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,7 +22,7 @@ class Character:
         full_name = '{} {}-{}'.format(self.name, self.region, self.realm)
         tmp_file_name = '.tmp_imported_file_for_simcraft.simc'
         self._logger.info('Importing {}...'.format(full_name))
-        cmd_command = ['simc64', 'armory={},{},{}'.format(self.region, self.realm, self.name)]
+        cmd_command = [simc_path, 'armory={},{},{}'.format(self.region, self.realm, self.name)]
         if self.is_offspec:
             cmd_command[-1] += ',spec=inactive'
         cmd_command.append('save={}'.format(tmp_file_name))

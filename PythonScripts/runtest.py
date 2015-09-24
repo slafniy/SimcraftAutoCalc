@@ -2,6 +2,7 @@ from datetime import datetime
 from subprocess import Popen, PIPE
 from Character import Character
 import logging
+from SimcraftHelper import simc_path
 
 logging.basicConfig(level=logging.INFO)
 
@@ -13,7 +14,6 @@ REGION = 'EU'
 REALM = 'Галакронд'
 RAIDERS = {'Джеви', 'Гринндерс', 'Арсти', 'Лапулька', 'Овермун', 'Уитэко', 'Импси', 'Террикс', 'Лич', 'Принсэс',
            'Нукактотак', 'Виченца', 'Ридион', 'Эмберлиз', 'Альф', 'Ирмос', 'Персефони', 'Торгитай', 'Серыйдуб'}
-
 
 logging.info("Downloading character profiles...")
 characters = []
@@ -32,7 +32,8 @@ try:
 except Exception as ex:
     print(ex)
 
-command_line = ['simc64', tmp_file_name, 'iterations=1000', 'html={}'.format(result_file)]
+command_line = [simc_path, tmp_file_name, 'iterations=1000',
+                'html={}'.format(result_file)]
 p = Popen(command_line, stderr=PIPE)
 out, err = p.communicate()
 if err:
