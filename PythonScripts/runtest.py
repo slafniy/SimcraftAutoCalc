@@ -1,7 +1,6 @@
 from datetime import datetime
 from subprocess import Popen, PIPE
 from Character import Character
-from uploader import upload_result
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -13,8 +12,8 @@ tmp_file_name = 'C:/Simcraft/SimcraftAutoCalc/Results/tmp.simc'
 REGION = 'EU'
 REALM = 'Галакронд'
 RAIDERS = {'Джеви', 'Гринндерс', 'Арсти', 'Лапулька', 'Овермун', 'Уитэко', 'Импси', 'Террикс', 'Лич', 'Принсэс',
-           'Нукактотак', 'Виченца', 'Ридион', 'Эмберлиз', 'Альф'}
-# RAIDERS = {'Импси', 'Альф', 'Джеви'}
+           'Нукактотак', 'Виченца', 'Ридион', 'Эмберлиз', 'Альф', 'Ирмос', 'Персефони', 'Торгитай', 'Серыйдуб'}
+
 
 logging.info("Downloading character profiles...")
 characters = []
@@ -39,5 +38,3 @@ out, err = p.communicate()
 if err:
     print(err)
     raise Exception("Simulation failed")
-else:
-    upload_result(result_file)
