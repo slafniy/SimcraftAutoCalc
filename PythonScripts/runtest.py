@@ -12,7 +12,7 @@ tmp_file_name = 'C:/Simcraft/SimcraftAutoCalc/Results/tmp.simc'
 
 REGION = 'EU'
 REALM = 'Галакронд'
-RAIDERS = {'Джеви', 'Гринндерс', 'Арсти', 'Лапулька', 'Овермун', 'Уитэко', 'Импси', 'Террикс', 'Лич', 'Принсэс',
+RAIDERS = {'Ладошки', 'Джеви', 'Гринндерс', 'Арсти', 'Лапулька', 'Овермун', 'Уитэко', 'Импси', 'Террикс', 'Лич', 'Принсэс',
            'Нукактотак', 'Виченца', 'Ридион', 'Эмберлиз', 'Альф', 'Ирмос', 'Персефони', 'Торгитай', 'Серыйдуб'}
 
 logging.info("Downloading character profiles...")
@@ -32,7 +32,7 @@ try:
 except Exception as ex:
     print(ex)
 
-command_line = [simc_path, tmp_file_name, 'iterations=1000',
+command_line = [simc_path, tmp_file_name, 'iterations=1000', 'max_time=500',
                 'html={}'.format(result_file)]
 p = Popen(command_line, stderr=PIPE)
 out, err = p.communicate()
