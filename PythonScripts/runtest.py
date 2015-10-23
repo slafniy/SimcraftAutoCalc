@@ -1,4 +1,5 @@
 from datetime import datetime
+from time import time, sleep
 from subprocess import Popen, PIPE
 from Character import Character
 import logging
@@ -16,11 +17,15 @@ RAIDERS = {'Ладошки', 'Джеви', 'Гринндерс', 'Арсти', '
            'Нукактотак', 'Виченца', 'Ридион', 'Эмберлиз', 'Альф', 'Ирмос', 'Персефони', 'Торгитай', 'Серыйдуб'}
 
 logging.info("Downloading character profiles...")
+start_time = time()
 characters = []
 for is_offspec in [True, False]:
     for name in RAIDERS:
         characters.append(Character(name=name, region=REGION, realm=REALM, is_offspec=is_offspec))
-logging.info("Characters are loaded.")
+while None in [c.simulation_profile for c in characters]:
+    logging.info("Waiting for characters download...")
+    sleep(0.5)
+logging.info("Characters are loaded in {} sec.".format(time() - start_time))
 
 logging.info("Creating common simulation profile...")
 all_characters_sim_profile = '\n\n'.join([c.simulation_profile for c in characters if c.simulation_profile is not None])

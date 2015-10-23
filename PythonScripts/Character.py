@@ -1,7 +1,9 @@
 import os
 from subprocess import Popen, PIPE
 import logging
+from threading import Thread
 from SimcraftHelper import simc_path
+from uuid import uuid4
 
 logging.basicConfig(level=logging.INFO)
 
@@ -16,11 +18,14 @@ class Character:
         self.realm = realm
         self.is_offspec = is_offspec
         self.simulation_profile = None
-        self._get_simulation_profile()
+        # Run profile loading in the separate thread
+        self._get_simulation_profile_thread = Thread(target=self._get_simulation_profile)
+        self._get_simulation_profile_thread.start()
     
     def _get_simulation_profile(self) -> None:
         full_name = '{} {}-{}'.format(self.name, self.region, self.realm)
-        tmp_file_name = '.tmp_imported_file_for_simcraft.simc'
+        tmp_file_name = '.tmp_imported_file_for_simcraft_{}_{}_{}_{}.simc'\
+            .format(self.region, self.realm, self.name, uuid4())
         self._logger.info('Importing {}...'.format(full_name))
         cmd_command = [simc_path, 'armory={},{},{}'.format(self.region, self.realm, self.name)]
         if self.is_offspec:
@@ -62,7 +67,7 @@ class Character:
                 if '# gear_ilvl=' in line:
                     ilvl = line.split('=')[1]
             if lines is None:
-                self.simulation_profile = None
+                self.simulation_profile = ''
                 return
             lines[0] = lines[0].split('=')[0] + '=' + '"{}"'.format(self.name + '_' + spec + '_' + ilvl)
             self.simulation_profile = '\n'.join(lines)
