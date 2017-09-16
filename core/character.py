@@ -1,15 +1,12 @@
-import os
-from subprocess import Popen, PIPE
 import logging
-from threading import Thread
-from SimcraftHelper import simc_path
-from uuid import uuid4
+import os
+import subprocess
+import uuid
 
 logging.basicConfig(level=logging.INFO)
 
 
 class Character:
-
     def __init__(self, name: str, region='EU', realm='Галакронд', is_offspec=False):
         self._logger = logging.getLogger("Character logger")
         self._logger.setLevel(10)
@@ -18,26 +15,21 @@ class Character:
         self.realm = realm
         self.is_offspec = is_offspec
         self.simulation_profile = None
-        # Run profile loading in the separate thread
-        self._get_simulation_profile_thread = Thread(target=self._get_simulation_profile)
-        self._get_simulation_profile_thread.start()
-    
-    def _get_simulation_profile(self) -> None:
+
+    def load_simulation_profile(self, simc_binary: str, tmp_files_location='C:/Temp') -> None:
+        # Check/create directory for temp files
+        tmp_dir = os.path.join(tmp_files_location, '.simcautocalctmpfiles')
+        if not os.path.isdir(tmp_dir):
+            os.mkdir(tmp_dir)
+
+        tmp_file_name = os.path.join(tmp_files_location,
+                                     '.tmp_imported_file_for_simcraft_{}_{}_{}_{}.simc'.format(self.region, self.realm,
+                                                                                               self.name, uuid.uuid4()))
+
         full_name = '{} {}-{}'.format(self.name, self.region, self.realm)
-        tmp_file_name = '.tmp_imported_file_for_simcraft_{}_{}_{}_{}.simc'\
-            .format(self.region, self.realm, self.name, uuid4())
         self._logger.info('Importing {}...'.format(full_name))
-        cmd_command = [simc_path, 'armory={},{},{}'.format(self.region, self.realm, self.name)]
-        if self.is_offspec:
-            cmd_command[-1] += ',spec=inactive'
-        cmd_command.append('save={}'.format(tmp_file_name))
-        simc_process = Popen(cmd_command, stderr=PIPE)
-        _, err = simc_process.communicate()
-        if err:
-            self._logger.warning("Error occurred while profile {} importing: {}"
-                                 .format(full_name, err))
-        else:
-            self._logger.info("Profile {} has been imported and saved to file {}".format(full_name, tmp_file_name))
+
+        self._load_profile(simc_binary, tmp_file_name, full_name)
 
         simulation_data = None
         try:
@@ -71,3 +63,16 @@ class Character:
                 return
             lines[0] = lines[0].split('=')[0] + '=' + '"{}"'.format(self.name + '_' + spec + '_' + ilvl)
             self.simulation_profile = '\n'.join(lines)
+
+    def _load_profile(self, simc_binary, tmp_file_name, full_name):
+        cmd_command = [simc_binary, 'armory={},{},{}'.format(self.region, self.realm, self.name)]
+        if self.is_offspec:
+            cmd_command[-1] += ',spec=inactive'
+        cmd_command.append('save={}'.format(tmp_file_name))
+        simc_process = subprocess.Popen(cmd_command, stderr=subprocess.PIPE)
+        _, err = simc_process.communicate()
+        if err:
+            self._logger.warning("Error occurred while profile {} importing: {}"
+                                 .format(full_name, err))
+        else:
+            self._logger.info("Profile {} has been imported and saved to file {}".format(full_name, tmp_file_name))
